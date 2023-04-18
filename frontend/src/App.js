@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import ToDoList from "./components/TodoList";
+import TabList from "./components/TabList";
 
 const initialTodoItems = [
   {
@@ -27,63 +29,15 @@ const initialTodoItems = [
   },
 ];
 
-const TabList = ({ displayCompleted, viewCompleted }) => {
-  return (
-    <div className="nav nav-tabs">
-      <span
-        className={viewCompleted ? "nav-link active" : "nav-link"}
-        onClick={() => displayCompleted(true)}
-      >
-        Complete
-      </span>
-      <span
-        className={viewCompleted ? "nav-link" : "nav-link active"}
-        onClick={() => displayCompleted(false)}
-      >
-        Incomplete
-      </span>
-    </div>
-  );
-};
-
-const TodoList = ({ todoItems, viewCompleted }) => {
-  const items = todoItems.filter((item) => item.completed === viewCompleted);
-
-  return items.map(({ id, description, title }) => (
-    <li
-      key={id}
-      className="list-group-item d-flex justify-content-between align-items-center"
-    >
-      <span
-        className={`todo-title mr-2 ${
-          viewCompleted ? "completed-todo" : ""
-        }`}
-        title={description}
-      >
-        {title}
-      </span>
-      <span>
-        <button className="btn btn-secondary mr-2">Edit</button>
-        <button className="btn btn-danger">Delete</button>
-      </span>
-    </li>
-  ));
-};
-
 const App = () => {
   const [viewCompleted, setViewCompleted] = useState(false);
   const [toDoItems, setTodoItems] = useState([]);
 
   useEffect(() => {
-    setTodoItems(initialTodoItems)
-  },
-  [])
-
-
+    setTodoItems(initialTodoItems);
+  }, []);
 
   const displayCompleted = (status) => {
-    console.log('\n\n ============== displayCompleted ', status)
-
     setViewCompleted(status);
   };
 
@@ -96,9 +50,12 @@ const App = () => {
             <div className="mb-4">
               <button className="btn btn-primary">Add task</button>
             </div>
-            <TabList viewCompleted={viewCompleted} displayCompleted={displayCompleted} />
+            <TabList
+              viewCompleted={viewCompleted}
+              displayCompleted={displayCompleted}
+            />
             <ul className="list-group list-group-flush border-top-0">
-              <TodoList viewCompleted={viewCompleted} todoItems={toDoItems}/>
+              <ToDoList viewCompleted={viewCompleted} todoItems={toDoItems} />
             </ul>
           </div>
         </div>
