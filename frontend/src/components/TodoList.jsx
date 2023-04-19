@@ -1,7 +1,7 @@
 import React from "react";
 
-const ToDoList = ({ todoItems, viewCompleted, editItem, handleDelete }) => {
-  const items = todoItems.filter((item) => item.completed === viewCompleted);
+const ToDoList = ({ toDoItems, viewCompleted, editItem, handleDelete }) => {
+  const items = toDoItems.filter((item) => item.completed === viewCompleted);
 
   return items.map((item) => {
     const { id, description, title } = item

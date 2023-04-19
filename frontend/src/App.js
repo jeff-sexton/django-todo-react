@@ -3,33 +3,6 @@ import ToDoList from "./components/TodoList";
 import TabList from "./components/TabList";
 import ToDoModal from "./components/ToDoModal";
 
-const initialTodoItems = [
-  {
-    id: 1,
-    title: "Go to Market",
-    description: "Buy ingredients to prepare dinner",
-    completed: true,
-  },
-  {
-    id: 2,
-    title: "Study",
-    description: "Read Algebra and History textbook for the upcoming test",
-    completed: false,
-  },
-  {
-    id: 3,
-    title: "Sammy's books",
-    description: "Go to library to return Sammy's books",
-    completed: true,
-  },
-  {
-    id: 4,
-    title: "Article",
-    description: "Write article on how to use Django with React",
-    completed: false,
-  },
-];
-
 const App = () => {
   const [viewCompleted, setViewCompleted] = useState(false);
   const [toDoItems, setTodoItems] = useState([]);
@@ -40,8 +13,20 @@ const App = () => {
     completed: false,
   });
 
+  const refreshToDos = async () => {
+    try {
+      const res = await fetch("/api/todos/");
+
+      const data = await res.json();
+
+      setTodoItems(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    setTodoItems(initialTodoItems);
+    refreshToDos();
   }, []);
 
   const displayCompleted = (status) => {
@@ -52,9 +37,29 @@ const App = () => {
     setModalOpen(!modalOpen);
   };
 
-  const handleSubmit = (item) => {
-    toggleModal();
-    alert("submit" + JSON.stringify(item));
+  const handleSubmit = async (item) => {
+    let url = "/api/todos/";
+    const requestOptions = {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(item),
+    };
+
+    // Handle edits to existing to dos
+    if (item.id) {
+      url = url + `${item.id}/`;
+      requestOptions.method = "put";
+    }
+
+    try {
+      await fetch(url, requestOptions);
+      await refreshToDos();
+      toggleModal();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const createItem = () => {
@@ -63,8 +68,18 @@ const App = () => {
     toggleModal();
   };
 
-  const handleDelete = (item) => {
-    alert("delete" + JSON.stringify(item));
+  const handleDelete = async (item) => {
+    try {
+      await fetch(`/api/todos/${item.id}/`, {
+        method: "delete",
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      await refreshToDos();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const editItem = (item) => {
@@ -90,7 +105,7 @@ const App = () => {
             <ul className="list-group list-group-flush border-top-0">
               <ToDoList
                 viewCompleted={viewCompleted}
-                todoItems={toDoItems}
+                toDoItems={toDoItems}
                 editItem={editItem}
                 handleDelete={handleDelete}
               />
